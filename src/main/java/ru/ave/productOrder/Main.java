@@ -234,7 +234,7 @@ public class Main {
         Map<String, List<String>> productNamePerCategory = customers.stream().flatMap(c -> c.getOrders().stream())
                 .flatMap(o -> o.getProducts().stream())
                 .distinct()
-                .collect(Collectors.groupingBy(Product::getCategory, HashMap::new, Collectors.mapping(Product::getName, Collectors.toList())));
+                .collect(Collectors.groupingBy(Product::getCategory, Collectors.mapping(Product::getName, Collectors.toList())));
 
         // System.out.println(productNamePerCategory);
 
@@ -242,11 +242,14 @@ public class Main {
         // Задание 15
         // Получите Map<String, Product> → самый дорогой продукт по каждой категории.
 
-   //     Map<String, Product> maxPriceProductPerCategory = customers.stream().flatMap(c -> c.getOrders().stream())
-   //             .flatMap(o -> o.getProducts().stream())
-   //             .distinct()
-   //             .collect(Collectors.groupingBy(Product::getCategory, HashMap::new, Collectors.flatMapping()
-//
+        Map<String, Product> maxPriceProductPerCategory = customers.stream().flatMap(c -> c.getOrders().stream())
+                .flatMap(o -> o.getProducts().stream())
+                .distinct()
+                .collect(Collectors.groupingBy(Product::getCategory
+                        , Collectors.collectingAndThen(Collectors.maxBy(Comparator.comparing(Product::getPrice))
+                                , opt -> opt.orElse(null))));
+
+        System.out.println(maxPriceProductPerCategory);
 
 
     }
