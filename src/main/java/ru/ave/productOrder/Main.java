@@ -5,9 +5,11 @@ import ru.ave.productOrder.models.Order;
 import ru.ave.productOrder.models.Product;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -132,22 +134,120 @@ public class Main {
         //prosuctsL3.forEach(System.out::println);
 
         // Задание 5
-/*
+
         List<Product> topMinPriceEat = customers.stream().flatMap(c -> c.getOrders().stream())
                 .flatMap(o -> o.getProducts().stream())
                 .distinct()
-                .sorted(Comparator.comparing())
-*/
+                .filter(p -> p.getCategory().equals("детские товары"))
+                .sorted(Comparator.comparing(Product::getPrice))
+                .limit(2).toList();
+
+        // topMinPriceEat.forEach(System.out::println);
+
         // Задание 6
+
+        List<Order> last3Orders = customers.stream()
+                .flatMap(c -> c.getOrders().stream())
+                .sorted(Comparator.comparing(Order::getOrderDate).reversed())
+                .limit(3)
+                .toList();
+
+        // last3Orders.forEach(System.out::println);
+
         // Задание 7
+        // Получите список заказов, сделанных "2026, апрель, 2", выведите id заказов в консоль и затем верните
+        // список их продуктов.
+
+        List<Product> products020426 = customers.stream()
+                .flatMap(c -> c.getOrders().stream())
+                .filter(o -> o.getOrderDate().equals(LocalDate.of(2026,4,2)))
+        //        .peek(o -> System.out.println(o.getId()))
+                .flatMap(o -> o.getProducts().stream())
+                .toList();
+
+        // products020426.forEach(System.out::println);
+
         // Задание 8
+        // Рассчитайте общую сумму всех заказов, сделанных в феврале 2026.
+
+        BigDecimal sumFeb26Order = customers.stream().flatMap(c -> c.getOrders().stream())
+                .filter(o -> o.getOrderDate().isBefore(LocalDate.of(2026,5,1))
+                        && o.getOrderDate().isAfter(LocalDate.of(2026,3,31)))
+                .flatMap(o -> o.getProducts().stream())
+                .map(Product::getPrice)
+                .reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
+
+        // System.out.println(sumFeb26Order);
+
         // Задание 9
+        // Рассчитайте средний платеж по заказам, сделанным 2-апреля-2026.
+
+        List<Order> orders020426 = customers.stream().flatMap(c -> c.getOrders().stream())
+                .filter(o -> o.getOrderDate().equals(LocalDate.of(2026,4,2)))
+                .toList();
+        BigDecimal avgOrders020426 = orders020426.stream().flatMap(o -> o.getProducts().stream())
+                .map(Product::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add).divide(BigDecimal.valueOf(orders020426.size()), RoundingMode.HALF_DOWN);
+
+        //System.out.println(avgOrders020426);
+
         // Задание 10
+
+        DoubleSummaryStatistics kidsProduct = customers.stream().flatMap(o -> o.getOrders().stream())
+                .flatMap(p -> p.getProducts().stream())
+                .filter(p -> p.getCategory().equals("детские товары"))
+                .distinct()
+                .mapToDouble(p -> p.getPrice().doubleValue())
+                .summaryStatistics();
+
+        // System.out.println(kidsProduct.getMax());
+        // System.out.println(kidsProduct.getAverage());
+        // System.out.println(kidsProduct.getCount());
+        // System.out.println(kidsProduct.getMin());
+        // System.out.println(kidsProduct.getSum());
+
         // Задание 11
+        // Получите данные Map<Long, Integer> → key - id заказа, value - кол-во товаров в заказе
+
+        Map<Long, Integer> countProductPerOrder = customers.stream().flatMap(c -> c.getOrders().stream())
+                .collect(Collectors.toMap(Order::getId, o -> o.getProducts().size()));
+
         // Задание 12
+        //Создайте Map<Customer, List<Order>> → key - покупатель, value - список его заказов
+
+        Map<Customer, List<Order>> customerListMap = customers.stream()
+                .collect(Collectors.toMap(c -> c, c -> new ArrayList<>(c.getOrders())));
+
         // Задание 13
+        // Создайте Map<Order, Double> → key - заказ, value - общая сумма продуктов заказа.
+
+        Map<Order, Double> priceByOrders = customers.stream().flatMap(c -> c.getOrders().stream())
+                .collect(Collectors.toMap(o -> o
+                        , o -> o.getProducts().stream()
+                                .mapToDouble(p -> p.getPrice().doubleValue()).sum()));
+
+        //System.out.println(priceByOrders);
+
         // Задание 14
+        // Получите Map<String, List<String>> → key - категория, value - список названий товаров в категории
+
+        Map<String, List<String>> productNamePerCategory = customers.stream().flatMap(c -> c.getOrders().stream())
+                .flatMap(o -> o.getProducts().stream())
+                .distinct()
+                .collect(Collectors.groupingBy(Product::getCategory, HashMap::new, Collectors.mapping(Product::getName, Collectors.toList())));
+
+        // System.out.println(productNamePerCategory);
+
+
         // Задание 15
+        // Получите Map<String, Product> → самый дорогой продукт по каждой категории.
+
+   //     Map<String, Product> maxPriceProductPerCategory = customers.stream().flatMap(c -> c.getOrders().stream())
+   //             .flatMap(o -> o.getProducts().stream())
+   //             .distinct()
+   //             .collect(Collectors.groupingBy(Product::getCategory, HashMap::new, Collectors.flatMapping()
+//
+
 
     }
 
