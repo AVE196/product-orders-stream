@@ -7,10 +7,7 @@ import ru.ave.productOrder.models.Product;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Main {
 
@@ -64,9 +61,9 @@ public class Main {
         Order order10 = new Order(LocalDate.of(2026, 3, 18), LocalDate.of(2026, 3, 19), "в процесс", products10);
         Order order11 = new Order(LocalDate.of(2026, 3, 18), LocalDate.of(2026, 3, 19), "доставлен", products11);
         Order order12 = new Order(LocalDate.of(2026, 3, 18), LocalDate.of(2026, 3, 19), "в процесс", products12);
-        Order order13 = new Order(LocalDate.of(2026, 3, 2), LocalDate.of(2026, 3, 11), "доставлен", products13);
-        Order order14 = new Order(LocalDate.of(2026, 3, 2), LocalDate.of(2026, 3, 11), "в процесс", products14);
-        Order order15 = new Order(LocalDate.of(2026, 3, 2), LocalDate.of(2026, 6, 11), "доставлен", products15);
+        Order order13 = new Order(LocalDate.of(2026, 4, 2), LocalDate.of(2026, 5, 11), "доставлен", products13);
+        Order order14 = new Order(LocalDate.of(2026, 4, 2), LocalDate.of(2026, 5, 11), "в процесс", products14);
+        Order order15 = new Order(LocalDate.of(2026, 4, 2), LocalDate.of(2026, 6, 11), "доставлен", products15);
         Order order16 = new Order(LocalDate.of(2026, 6, 2), LocalDate.of(2026, 6, 11), "доставлен", products16);
         Order order17 = new Order(LocalDate.of(2026, 6, 2), LocalDate.of(2026, 6, 11), "доставлен", products17);
         Order order18 = new Order(LocalDate.of(2026, 6, 6), LocalDate.of(2026, 6, 8), "в процесс", products18);
@@ -91,7 +88,66 @@ public class Main {
         customers.add(new Customer("Саня", 2L,orders4));
         customers.add(new Customer("Толян", orders5));
 
+        // Задание 1
 
+        List<Product> eatSmall100 = customers.stream()
+                .flatMap(x -> x.getOrders().stream())
+                .flatMap(o -> o.getProducts().stream())
+                .distinct()
+                .filter(p -> p.getCategory().equalsIgnoreCase("еда"))
+                .filter(p -> p.getPrice().compareTo(BigDecimal.valueOf(100)) <= 0)
+                .toList();
+
+        //eatSmall100.stream().map(Product::getName).forEach(System.out::println);
+
+        // Задание 2
+
+        List<Order> ordersChildProduct = customers.stream()
+                .flatMap(c -> c.getOrders().stream())
+                .filter(o -> o.getProducts().stream().anyMatch(p -> p.getCategory().equals("детские товары")))
+                .distinct()
+                .toList();
+
+        //ordersChildProduct.forEach(System.out::println);
+
+        // Задание 3
+
+        BigDecimal sumAlco = customers.stream()
+                .flatMap(c -> c.getOrders().stream())
+                .flatMap(o -> o.getProducts().stream())
+                .filter(p -> p.getCategory().equals("алкоголь"))
+                .map(p -> p.getPrice().multiply(BigDecimal.valueOf(0.9)))
+                .reduce(BigDecimal::add).orElse(BigDecimal.valueOf(0));
+
+        //System.out.println(sumAlco);
+
+        // Задание 4
+
+        List<Product> prosuctsL3 = customers.stream()
+                .filter(c -> c.getLevel() == 3L)
+                .flatMap(c -> c.getOrders().stream())
+                .filter(o -> o.getOrderDate().isAfter(LocalDate.of(2026,4,1)) && o.getOrderDate().isBefore(LocalDate.of(2026,6,1)))
+                .flatMap(o -> o.getProducts().stream()).toList();
+
+        //prosuctsL3.forEach(System.out::println);
+
+        // Задание 5
+/*
+        List<Product> topMinPriceEat = customers.stream().flatMap(c -> c.getOrders().stream())
+                .flatMap(o -> o.getProducts().stream())
+                .distinct()
+                .sorted(Comparator.comparing())
+*/
+        // Задание 6
+        // Задание 7
+        // Задание 8
+        // Задание 9
+        // Задание 10
+        // Задание 11
+        // Задание 12
+        // Задание 13
+        // Задание 14
+        // Задание 15
 
     }
 
